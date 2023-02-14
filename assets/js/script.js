@@ -31,19 +31,38 @@ const getStarWarsList = async () => {
   try {
     const res = await axios.get("https://swapi.dev/api/people/");
     createCard(res);
-    const page2 = res.data.next;
-    const res2 = await axios.get(page2);
-    createCard(res2)
-    const page3 = res2.data.next;
-    const res3 = await axios.get(page3);
-    createCard(res3)
-
+    const res2 = await axios.get(res.data.next);
+    createCard(res2);
+    const res3 = await axios.get(res2.data.next);
+    createCard(res3);
   } catch (e) {
     console.log("ERROR", e);
   }
 };
 
-getStarWarsList()
+const getDadJoke = async () => {
+  try {
+    const config = { headers: { Accept: "application/json" } };
+    const res = await axios.get("https://icanhazdadjoke.com", config);
+    console.log(res);
+    showDadJoke(res);
+  } catch (e) {
+    console.log("ERROR:", e);
+  }
+};
+
+const loadPage = async () => {
+  try {
+    await getStarWarsList();
+    await getDadJoke();
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+loadPage();
+
+var row = $("<div>").attr("class", "row");
 
 function createCard(starData) {
   let names = [];
@@ -51,8 +70,8 @@ function createCard(starData) {
     names.push(starData.data.results[i].name);
   }
   let nameString = names.toString();
-  var div = $("<div>");
-  div.attr("class", "card").attr("style", "width: 20rem");
+  const div = $("<div>");
+  div.attr("class", "card col-4");
   div.html(
     '<div class="card-body">' +
       '<h5 class="card-title">People in Star Wars</h5>' +
@@ -61,5 +80,20 @@ function createCard(starData) {
       nameString +
       "</p>"
   );
-  $("body").append(div);
+  row.append(div);
+  $("body").append(row);
+}
+
+function showDadJoke(dadData) {
+  const div = $("<div>");
+  div.attr("class", "card col-12");
+  div.html(
+    '<div class="card-body">' +
+      '<h5 class="card-title">Dad Joke</h5>' +
+      '<p class="card-text">' +
+      dadData.data.joke +
+      "</p>"
+  );
+  row.append(div);
+  $("body").append(row);
 }
